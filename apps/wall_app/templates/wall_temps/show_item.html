@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Show Item</title>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'wall_css/style.css' %}">
+</head>
+<body>
+    <div class="container">
+     <h1>These people also wished on item {{ request.session.first_name }} {{ request.session.last_name }}</h1>
+     <form class="inline" action="/logout" method="">
+        {% csrf_token %}
+            <input type='submit' value='Go Back'>
+    </form>
+    </div>
+    <ul>
+        <li>{{ request.session.first_name }} {{ request.session.last_name }}</li>
+        <li>{{ request.session.first_name }} {{ request.session.last_name }}</li>
+        <li>{{ request.session.first_name }} {{ request.session.last_name }}</li>
+    </ul>
+    
+</body>
+</html>

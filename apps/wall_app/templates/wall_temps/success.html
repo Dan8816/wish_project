@@ -1,0 +1,43 @@
+<!doctype html>
+<html>
+<head>
+    <title>Dojo Secrets</title>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'wall_css/style.css' %}">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>I see you are {{ request.session.first_name }} {{ request.session.last_name }}</h1><br>
+            <form class="inline" action="/logout" method="">
+                {% csrf_token %}
+                    <input type='submit' value='Logout'>
+            </form>
+            <h2>Add Items to your list!</h2>
+        </div>
+        <form action="/success/post_msg" method="POST">
+            {% csrf_token %}
+                <textarea name="name" id="" cols="50" rows=""></textarea><br>
+                <input type="submit" value = "Add an Item">
+        </form>
+        <a href="/success/populars">Checkout messages all the cool Ninjas liked</a>
+    </div>
+    <h1>Most recent Items on your list</h1>
+    <table class="course_table">
+        <tr>
+            <th>Item Name</th>
+            <th>Added By</th>
+            <th>Date added</th>
+            <th>Actions<th>
+        </tr>
+        {% for i in items %}
+        <tr>
+            <td><a href="/{{ i.id }}/other_users">{{ i.name }}</a></td>
+            <td>{{ i.user.first_name }} {{ i.user.last_name }} </td>
+            <td>{{ i.created_at }}</td>
+            <td><a href="/{{ i.id }}/del_msg">remove</a></td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
