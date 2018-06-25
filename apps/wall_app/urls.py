@@ -3,11 +3,13 @@ from . import views
 urlpatterns = [
     url(r'^$', views.index),
     url(r'^create$', views.create),
-    url(r'^confirm$', views.confirm),
     url(r'^success$', views.success),
-    url(r'^success/post_msg$', views.create_msg),
-    url(r'^(?P<id>\d+)/del_msg$', views.del_msg),
-    url(r'^(?P<id>\d+)/other_users$', views.show_others),
+    url(r'^success/make_wish$', views.create_wish),
+    url(r'^(?P<id>\d+)/del_wish$', views.del_wish),
+    url(r'^other_users$', views.show_others),
+    url(r'^(?P<id>\d+)/user_wishes$', views.user_wishes),
+    url(r'^(?P<id>\d+)/remove_wishes$', views.remove_wishes),
+    url(r'^(?P<item_name>\w+)/item_wishes$', views.item_wishes),
     url(r'^login$', views.login),
     url(r'^logout$', views.logout),
 ]

@@ -34,14 +34,11 @@ class User(models.Model):
     def __repr__(self):
         return "<user: {} | {}, {} >".format(self.id, self.first_name, self.last_name, self.email, self.password)
 
-class Message(models.Model):
-    user = models.ForeignKey(User, related_name="post_msgs")
-    name = models.TextField(max_length=1000)
+class Wish(models.Model):
+    wisher = models.ForeignKey(User, related_name="makes_wishes")
+    item_name = models.CharField(max_length = 25)
+    wishes = models.ManyToManyField(User, related_name = "wished_item")
     created_at = models.DateTimeField(auto_now = True)
     updated_at = models.DateTimeField(auto_now_add = True)
     def __repr__(self):
-        return "<msg: {} | {} {}>".format(self.id, self.user, self.msg)
-
-class List(models.Model):
-    user = models.OneToOneField(User)
-    items = models.ManyToManyField(Message, blank=True)
+        return "<wish: {} | {} {}>".format(self.id, self.wisher, self.item_name, self.wishes)

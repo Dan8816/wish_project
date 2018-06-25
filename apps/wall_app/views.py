@@ -1,6 +1,6 @@
 from django.shortcuts import render, HttpResponse, redirect
 from django.core.urlresolvers import reverse
-from apps.wall_app.models import User, UserManager, Message, List
+from apps.wall_app.models import User, UserManager, Wish
 from django.contrib import messages
 import re, bcrypt
 
@@ -23,18 +23,11 @@ def create(request):
             password = bcrypt.hashpw(request.POST['confirmpassword'].encode(), bcrypt.gensalt())
         )
         print("successfully created users")
+        request.session['user_id']=new_user.id
         request.session['first_name']=request.POST['first_name']
         request.session['last_name']=request.POST['last_name']
         request.session['email']=request.POST['email']
-        return redirect('/confirm')
-
-def confirm(request):
-    if 'email' not in request.session:
-        return redirect('/')
-    context = {
-        "users" : User.objects.all(),
-    }
-    return render(request, "wall_temps/confirm.html", context)
+        return redirect('/success')
 
 def login(request):
     if User.objects.filter(email=request.POST['email']):
@@ -54,8 +47,9 @@ def success(request):
     if 'user_id' not in request.session:
         return redirect('/')
     context = {
-        "items" : Message.objects.order_by("created_at")[:5],
+        "wishes" : Wish.objects.filter(wisher_id=request.session['user_id']).order_by("created_at"),
         "users" : User.objects.all(),
+        "others" : Wish.objects.filter(wishes=request.session['user_id']).order_by("created_at")
     }
     print(request.session['user_id'])
     return render(request, "wall_temps/success.html", context)
@@ -64,18 +58,44 @@ def logout(request):
     request.session.clear()    
     return redirect('/')
 
-def create_msg(request):
-    Message.objects.create(name=request.POST["name"], user_id=request.session['user_id'])
+def create_wish(request):
+    Wish.objects.create(wisher_id=request.session['user_id'], item_name=request.POST["item_name"])
     return redirect('/success')
 
-def del_msg(request, id):
-    d = Message.objects.get(id=id)
-    if int(request.session['user_id']) == d.user_id:
+def del_wish(request, id):
+    d = Wish.objects.get(id=id)
+    if int(request.session['user_id']) == d.wisher_id:
         d.delete()
         return redirect('/success')
     else:
-        print("You did not post this")
+        print("You did not wish this")
         return redirect('/success')
 
-def show_others(request, id):
-    return render(request, "wall_temps/show_item.html")
+def show_others(request):
+    context = {
+        "wishes" : Wish.objects.exclude(wisher_id=request.session['user_id']).order_by("created_at")[:10],
+        "users" : User.objects.all()
+    }
+    print(context)
+    return render(request, "wall_temps/show_item.html", context)
+
+def user_wishes(request, id):
+    this_user = User.objects.get(id=request.session['user_id'])
+    this_wish = Wish.objects.get(id=id)
+    this_wish.wishes.add(this_user)
+    this_wish.save()
+    return redirect('/success')
+
+def item_wishes(request, item_name):
+    context = {
+        "wishes" : Wish.objects.filter(item_name=item_name),
+    }
+    print(context)
+    return render(request, "wall_temps/this_item.html", context)
+
+def remove_wishes(request, id):
+    this_user = User.objects.get(id=request.session['user_id'])
+    this_wish = Wish.objects.get(id=id)
+    this_wish.wishes.remove(this_user)
+    this_wish.save()
+    return redirect('/success')
