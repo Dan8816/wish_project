@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
 <head>
-    <title>User List</title>
+    <title>Make Wish</title>
     {% load static %}
     <link rel="stylesheet" type="text/css" href="{% static 'wall_css/style.css' %}">
 </head>
@@ -13,15 +13,8 @@
                 {% csrf_token %}
                     <input type='submit' value='Logout'>
             </form>
-            <h2>Add Items to your list!</h2>
+            <a href="make_wish">Make a wish to add items to the list</a>
         </div>
-        <form action="/success/make_wish" method="POST">
-            {% csrf_token %}
-                <textarea name="item_name" id="" cols="30" rows="1"></textarea><br>
-                <input type="submit" value = "Add an Item">
-        </form>
-    </div>
-    <a href="/other_users">See other user's wished items</a>
     <h1>Most recent Items on your wish list</h1>
     <table class="wish_table">
         <tr>
@@ -30,12 +23,12 @@
             <th>Date added</th>
             <th>Actions<th>
         </tr>
-        {% for i in wishes %}
+        {% for i in wishlist %}
         <tr>
             <td><a href="/{{ i.item_name }}/item_wishes">{{ i.item_name }}</a></td>
             <td>{{ i.wisher.first_name }} {{ i.wisher.last_name }} </td>
             <td>{{ i.created_at }}</td>
-            <td><a href="/{{ i.id }}/del_wish">remove</a></td>
+            <td><a href="/{{ i.id }}/del_wish">Delete your wish</a></td>
         </tr>
         {% endfor %}
         {% for i in others %}
@@ -43,9 +36,29 @@
             <td><a href="/{{ i.item_name }}/item_wishes">{{ i.item_name }}</a></td>
             <td>{{i.wisher.first_name }} {{i.wisher.last_name}}</td>
             <td>{{i.created_at}}</td>
-            <td><a href="/{{ i.id }}/remove_wishes">remove</a></td>
+            <td><a href="/{{ i.id }}/remove_wishes">Remove from list</a></td>
         </tr>
         {% endfor %}
     </table>
+    <div class="header">
+        <h1>These people also also wished on these items</h1>
+    </div>
+    <table class="wish_table">
+        <tr>
+            <th>Item Name</th>
+            <th>Added By</t>
+            <th>Date added</th>
+            <th>Actions<th>
+        </tr>
+        {% for i in otherwishes %}
+        <tr>
+            <td>{{ i.item_name }}</td>
+            <td>{{ i.wisher.first_name }} {{ i.wisher.last_name }} </td>
+            <td>{{ i.created_at }}</td>
+            <td><a href="/{{ i.id }}/user_wishes">Add to my list</a></td>
+        </tr>
+        {% endfor %}
+    </table>
+    </div>
 </body>
 </html>

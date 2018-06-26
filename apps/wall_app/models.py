@@ -1,5 +1,7 @@
 from __future__ import unicode_literals
 from django.db import models
+from datetime import date
+from django.utils.dateparse import parse_date
 import re, bcrypt
 
 EMAIL_REGEX = re.compile(r'^[a-zA-Z0-9\.\+_-]+@[a-zA-Z0-9\._-]+\.[a-zA-Z]*$')
@@ -23,16 +25,26 @@ class UserManager(models.Manager):
             errors['email'] = "A valid email address is required"
         if User.objects.filter(email=postData['email']).exists():
             errors['email_reg'] = "This email address has already been registered"
+        if len(postData['hire']) == 0:
+            errors['hire'] = 'Hire date must be fulfilled'
+            return errors
+        if postData['hire'] < '2017-01-01':
+            errors['hire'] = 'Hire date is to early' 
+        x = parse_date(postData['hire'])
+        if x > date.today():
+            errors['hire'] = 'Hire date later than today'
         return errors
 
 class User(models.Model):
     first_name = models.CharField(max_length = 25)
     last_name = models.CharField(max_length = 25)
     email = models.CharField(max_length = 50)
+    hire = models.DateField(auto_now = False)
     password = models.CharField(max_length = 255)
     objects = UserManager()
     def __repr__(self):
         return "<user: {} | {}, {} >".format(self.id, self.first_name, self.last_name, self.email, self.password)
+
 
 class Wish(models.Model):
     wisher = models.ForeignKey(User, related_name="makes_wishes")

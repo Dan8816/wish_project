@@ -20,8 +20,10 @@ def create(request):
             first_name = request.POST['first_name'],
             last_name = request.POST['last_name'],
             email = request.POST['email'],
+            hire = request.POST['hire'],
             password = bcrypt.hashpw(request.POST['confirmpassword'].encode(), bcrypt.gensalt())
         )
+        print(request.POST['hire'])
         print("successfully created users")
         request.session['user_id']=new_user.id
         request.session['first_name']=request.POST['first_name']
@@ -46,17 +48,19 @@ def login(request):
 def success(request):
     if 'user_id' not in request.session:
         return redirect('/')
-    context = {
-        "wishes" : Wish.objects.filter(wisher_id=request.session['user_id']).order_by("created_at"),
-        "users" : User.objects.all(),
-        "others" : Wish.objects.filter(wishes=request.session['user_id']).order_by("created_at")
+    UserList = {
+        "wishlist" : Wish.objects.filter(wisher_id=request.session['user_id']).order_by("created_at"),
+        "others" : Wish.objects.filter(wishes=request.session['user_id']).order_by("created_at"),
+        "otherwishes" : Wish.objects.exclude(wisher_id=request.session['user_id']).order_by("created_at")
     }
-    print(request.session['user_id'])
-    return render(request, "wall_temps/success.html", context)
+    return render(request, "wall_temps/success.html", UserList)
 
 def logout(request):
     request.session.clear()    
     return redirect('/')
+
+def make_wish(request):
+    return render(request, "wall_temps/make_wish.html")
 
 def create_wish(request):
     Wish.objects.create(wisher_id=request.session['user_id'], item_name=request.POST["item_name"])
@@ -70,14 +74,6 @@ def del_wish(request, id):
     else:
         print("You did not wish this")
         return redirect('/success')
-
-def show_others(request):
-    context = {
-        "wishes" : Wish.objects.exclude(wisher_id=request.session['user_id']).order_by("created_at")[:10],
-        "users" : User.objects.all()
-    }
-    print(context)
-    return render(request, "wall_temps/show_item.html", context)
 
 def user_wishes(request, id):
     this_user = User.objects.get(id=request.session['user_id'])

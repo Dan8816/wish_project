@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>This Item</title>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'wall_css/style.css' %}">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>Add Items to your list!</h2>
+            <form action="create_wish" method="POST">
+                {% csrf_token %}
+                <textarea name="item_name" id="" cols="30"rows="1"></textarea><br>
+                <input type="submit" value = "Add an Item">
+            </form>
+            <a href="success">Back to your list</a>
+        </div>
+    </div>   
+</body>
+</html>
